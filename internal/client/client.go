@@ -6,8 +6,10 @@ import(
 )
 
 type Client struct{
+	ID string
 	Conn *websocket.Conn
 	Send chan []byte
+	Room interface{}
 }
 func NewClient(conn *websocket.Conn)*Client{
 	return &Client{

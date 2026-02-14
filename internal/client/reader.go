@@ -2,7 +2,7 @@ package client
 
 import "log"
 
-func (c *Client)ReadPump(){
+func (c *Client)ReadPump(broadcast chan[]byte){
 	defer func(){
 		log.Println("Client disconnected")
 		c.Conn.Close()
@@ -14,6 +14,7 @@ func (c *Client)ReadPump(){
 			break
 		}
 		log.Printf("Received message: %s",msg)
+		broadcast<-msg
 
 	}
 	

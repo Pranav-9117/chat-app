@@ -1,18 +1,21 @@
 package server
 
 import (
-	"chat-app/internal/client"
 	"log"
 	"net/http"
-
 	"github.com/gorilla/websocket"
+	"chat-app/internal/client"
+	"chat-app/internal/room"
 )
 
 type Server struct {
 	upgrader websocket.Upgrader
+	room *room.Room
 }
 
 func NewServer() *Server {
+	r:=room.NewRoom("Valorant")
+	go r.Run()
 	return &Server{
 		upgrader: websocket.Upgrader{
 			ReadBufferSize:  1024,
@@ -21,6 +24,7 @@ func NewServer() *Server {
 				return true
 			},
 		},
+		room: r,
 	}
 }
 
@@ -32,6 +36,7 @@ func (s *Server) HandleWebSocket(w http.ResponseWriter, r *http.Request) {
 	}
 	log.Println("Connection established")
 	cl := client.NewClient(conn)
-	go cl.ReadPump()
+	s.room.Join<-cl
+	go cl.ReadPump(s.room.Broadcast)
 	go cl.WritePump()
 }
