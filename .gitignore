@@ -1,0 +1,35 @@
+# Go Build Artifacts
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+
+# Output binaries
+whatsapp_lite
+whatsapp_lite.exe
+chat-app
+chat-app.exe
+
+# Go Modules
+vendor/
+go.work
+go.work.sum
+
+# Logs
+*.log
+
+# Environment Files
+.env
+
+# Coverage Files
+coverage.out
+
+# OS Generated Files
+.DS_Store
+Thumbs.db
+
+# IDE / Editor
+.vscode/
+.idea/
