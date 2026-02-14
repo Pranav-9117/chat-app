@@ -1,6 +1,10 @@
 package client
 
-import "log"
+import (
+	"log"
+
+	"github.com/gorilla/websocket"
+)
 
 func (c *Client)WritePump(){
 	defer c.Conn.Close()
@@ -10,7 +14,7 @@ func (c *Client)WritePump(){
 		if !ok{
 			return
 		}
-		err:=c.Conn.WriteMessage(1,msg)
+		err:=c.Conn.WriteMessage(websocket.TextMessage,msg)
 		if err!=nil{
 			log.Println("Write error",err)
 			return

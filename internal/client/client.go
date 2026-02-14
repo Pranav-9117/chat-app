@@ -3,14 +3,16 @@ package client
 import(
 	"log"
 	"github.com/gorilla/websocket"
+	
 )
 
-type Client struct{
-	ID string
+type Client struct {
+	ID   string
 	Conn *websocket.Conn
 	Send chan []byte
-	Room interface{}
+	
 }
+
 func NewClient(conn *websocket.Conn)*Client{
 	return &Client{
 		Conn:conn,
@@ -25,5 +27,5 @@ func (c *Client)Close(){
 		log.Println("failed to close the connection")
 
 	}
-	close(c.Send)
+	
 }

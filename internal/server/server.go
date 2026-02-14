@@ -1,21 +1,23 @@
 package server
 
 import (
+	"encoding/json"
 	"log"
 	"net/http"
-	"github.com/gorilla/websocket"
+
 	"chat-app/internal/client"
 	"chat-app/internal/room"
+	"chat-app/models"
+
+	"github.com/gorilla/websocket"
 )
 
 type Server struct {
 	upgrader websocket.Upgrader
-	room *room.Room
+	manager  *room.Manager
 }
 
 func NewServer() *Server {
-	r:=room.NewRoom("Valorant")
-	go r.Run()
 	return &Server{
 		upgrader: websocket.Upgrader{
 			ReadBufferSize:  1024,
@@ -24,19 +26,42 @@ func NewServer() *Server {
 				return true
 			},
 		},
-		room: r,
+		manager: room.NewManager(),
 	}
 }
 
 func (s *Server) HandleWebSocket(w http.ResponseWriter, r *http.Request) {
+
 	conn, err := s.upgrader.Upgrade(w, r, nil)
 	if err != nil {
-		log.Println("Upgrade failed", err)
+		log.Println("Upgrade failed:", err)
 		return
 	}
+
 	log.Println("Connection established")
+
 	cl := client.NewClient(conn)
-	s.room.Join<-cl
-	go cl.ReadPump(s.room.Broadcast)
+
+	
 	go cl.WritePump()
+
+	go cl.ReadPump(func(msg models.Message) {
+
+		
+		rm := s.manager.GetRoom(msg.RoomId)
+
+		
+		rm.JoinClient(cl)
+
+		log.Printf("Received message from %s in room %s: %s\n",
+			msg.SenderId,
+			msg.RoomId,
+			msg.Msg,
+		)
+
+		
+		finalMsg, _ := json.Marshal(msg)
+
+		rm.BroadcastMessage(finalMsg)
+	})
 }

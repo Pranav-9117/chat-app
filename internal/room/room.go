@@ -26,14 +26,18 @@ func(r *Room)Run(){
 	log.Println("Room started",r.ID)
 	for{
 		select{
-		case cl:=<-r.Join:
-			r.Clients[cl]=true
-			log.Println("Client joined the room:",r.ID)
+		case cl := <-r.Join:
+    		if !r.Clients[cl] {
+        		r.Clients[cl] = true
+        		log.Println("Client joined the room:", r.ID)
+    		}
 		
-		case cl:=<-r.Leave:
-			delete(r.Clients,cl)
-			close(cl.Send)
-			log.Println("Client left the room:",r.ID)
+		case cl := <-r.Leave:
+    		if r.Clients[cl] {
+        		delete(r.Clients, cl)
+        		close(cl.Send)
+       		 log.Println("Client left the room:", r.ID)
+    		}
 		
 		case msg:=<-r.Broadcast:
 			for cl:=range r.Clients{
@@ -48,4 +52,17 @@ func(r *Room)Run(){
 
 		}
 	}
+
+}
+
+func (r *Room) JoinClient(c *client.Client) {
+	r.Join <- c
+}
+
+func (r *Room) BroadcastMessage(msg []byte) {
+	r.Broadcast <- msg
+}
+
+func (r *Room) LeaveClient(c *client.Client) {
+    r.Leave <- c
 }

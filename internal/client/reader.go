@@ -1,21 +1,32 @@
 package client
 
-import "log"
+import (
+	"chat-app/models"
+	"encoding/json"
+	"log"
+)
 
-func (c *Client)ReadPump(broadcast chan[]byte){
-	defer func(){
+func (c *Client) ReadPump(messageHandler func(models.Message)) {
+
+	defer func() {
 		log.Println("Client disconnected")
-		c.Conn.Close()
+		c.Close()
 	}()
-	for{
-		_,msg,err:=c.Conn.ReadMessage()
-		if err!=nil{
-			log.Println("Read error",err)
+
+	for {
+		_, msgBytes, err := c.Conn.ReadMessage()
+		if err != nil {
+			log.Println("Read error:", err)
 			break
 		}
-		log.Printf("Received message: %s",msg)
-		broadcast<-msg
 
+		var message models.Message
+		err = json.Unmarshal(msgBytes, &message)
+		if err != nil {
+			log.Println("Invalid JSON:", err)
+			continue
+		}
+
+		messageHandler(message)
 	}
-	
 }
