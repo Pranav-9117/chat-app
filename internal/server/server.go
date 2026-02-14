@@ -1,6 +1,7 @@
 package server
 
 import (
+	"chat-app/internal/client"
 	"log"
 	"net/http"
 
@@ -30,6 +31,7 @@ func (s *Server) HandleWebSocket(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	log.Println("Connection established")
-	defer conn.Close()
-
+	cl := client.NewClient(conn)
+	go cl.ReadPump()
+	go cl.WritePump()
 }
