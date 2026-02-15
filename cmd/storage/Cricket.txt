@@ -1,2 +1,0 @@
-{"SenderId":"user4","RoomId":"Cricket","Msg":"MSD"}
-{"SenderId":"user3","RoomId":"Cricket","Msg":"Santner"}

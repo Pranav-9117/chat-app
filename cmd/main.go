@@ -11,7 +11,7 @@ func main() {
 	port := ":8080"
 
 	srv := server.NewServer()
-	http.Handle("/", http.FileServer(http.Dir("../static")))
+	http.Handle("/", http.FileServer(http.Dir("./static")))
 	http.HandleFunc("/ws", srv.HandleWebSocket)
 	log.Println("Server running on ", port)
 	err := http.ListenAndServe(port, nil)
